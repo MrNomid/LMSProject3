@@ -1,15 +1,14 @@
-from data.users import User
+from data.comments import Comments
 from data import db_session
 
 
+
 def main():
-    user = User()
-    user.name = "Пользователь 1"
-    user.display_name = "пользз"
-    user.email = "email1@email.ru"
-    user.set_password("123")
+    comment = Comments()
+    comment.author_id = 1
+    comment.content = 'very good, but could be better'
     db_sess = db_session.create_session()
-    db_sess.add(user)
+    db_sess.add(comment)
     db_sess.commit()
 
 

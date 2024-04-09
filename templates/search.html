@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% for track in tracks %}
+    <table align="center">
+      <tbody class="table-group-divider">
+          <tr>
+            <td><a href="/{{ track.image }}"><img width="150" height="150" src={{ track.image }} /></a></td>
+            <td>
+              <h5>{{ track.name }} | {{ track.author }}</h5>
+              <audio controls src={{ track.track_file }}></audio>
+              <h6>{{ track.description }}</h6>
+            </td>
+          </tr>
+
+          <tr>
+            <td><h5 align="center">{{ track.rating }}</h5></td>
+            <td><a class="btn btn-success" href="/upvote">Upvote</a>
+                <a class="btn btn-warning" href="/add_to_favorites">Add to favorites</a>
+                <a class="btn btn-primary" href="/comment">Comment</a>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+  {% endfor %}
+
+{% endblock %}

@@ -13,10 +13,10 @@
         <div>
             <nav class="navbar navbar-light bg-light">
                 <h1>MOMusic</h1>
-                <a class="navbar-brand" href="/" style="color: #a6a7aa">Главная</a>
+                <a class="navbar-brand" href="/search" style="color: #a6a7aa">Главная</a>
                 {% if current_user.is_authenticated %}
-                     <a class="btn btn-danger" href="/logout">Выйти</a>
-                     <a class="navbar-brand" href="/logout">{{ current_user.name }} {{ current_user.surname }}</a>
+                     <a class="navbar-brand" href="/load_track" style="color: #a6a7aa">Загрузить трек</a>
+                     <a class="navbar-brand" href="/profile">{{ current_user.name }}</a>
                 {% else %}
                     <p>
                         <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
