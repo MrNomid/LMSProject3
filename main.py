@@ -1,11 +1,15 @@
 from flask import Flask, url_for, render_template, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
+from data.comment_form import CommentForm
+from data.comments import Comments
+from data.favorites import Favorites
 from data.login_form import LoginForm
 from data.register_form import RegisterForm
 from data.load_track_form import LoadTrackForm
 from data.db_session import create_session, global_init
 from data.tracks import Tracks
+from data.upvotes import Upvotes
 from data.users import User
 from werkzeug.utils import secure_filename
 
@@ -100,22 +104,141 @@ def load_track():
         db_sess.add(track)
         db_sess.commit()
         db_sess.close()
-        return redirect('/search')
+        return redirect('/my_tracks')
     return render_template('load_track.html', form=form, title="Публикация трека")
 
 
 @app.route('/search')
 def search():
     db_sess = create_session()
-    tracks = db_sess.query(Tracks).filter(Tracks.rating >= 10).all()
+    tracks = db_sess.query(Tracks).all()
     for track in tracks:
         track.author = db_sess.query(User).filter(User.id == track.author).first().name
+        track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
+        track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
+    db_sess.close()
     return render_template('search.html', tracks=tracks)
 
 
-@app.route('/upvote')
-def upvote():
-    return None
+@app.route('/my_tracks', methods=['GET', 'POST'])
+def my_tracks():
+    db_sess = create_session()
+    tracks = db_sess.query(Tracks).filter(Tracks.author == current_user.id).all()
+    for track in tracks:
+        track.author = db_sess.query(User).filter(User.id == track.author).first().name
+        track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
+        track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
+    db_sess.close()
+    return render_template('my_tracks.html', tracks=tracks)
+
+
+@app.route('/delete/<track_id>')
+def delete(track_id):
+    db_sess = create_session()
+    x = db_sess.query(Tracks).filter(Tracks.id == track_id).first()
+
+    db_sess.delete(x)
+    db_sess.commit()
+    db_sess.close()
+
+    return redirect(f'/my_tracks')
+
+
+@app.route('/upvote/<track_id>')
+def upvote(track_id):
+    db_sess = create_session()
+    upvoted_tracks = []
+    for users_upvote in db_sess.query(Upvotes).filter(Upvotes.user_id == current_user.id).all():
+        upvoted_tracks.append(int(users_upvote.track_id))
+
+    if int(track_id) not in upvoted_tracks:
+        upvote = Upvotes()
+        upvote.track_id = track_id
+        upvote.user_id = current_user.id
+        db_sess.add(upvote)
+
+    db_sess.commit()
+    db_sess.close()
+
+    return redirect('/search')
+
+
+@app.route('/downvote/<track_id>')
+def downvote(track_id):
+    db_sess = create_session()
+    x = db_sess.query(Upvotes).filter(Upvotes.track_id == track_id, Upvotes.user_id == current_user.id).first()
+
+    db_sess.delete(x)
+    db_sess.commit()
+    db_sess.close()
+
+    return redirect('/search')
+
+
+@app.route('/comment/<track_id>', methods=['GET', 'POST'])
+def comment(track_id):
+    form = CommentForm()
+    if form.validate_on_submit():
+        comment = Comments()
+        comment.author_id = current_user.id
+        comment.content = form.content.data
+        comment.track_id = track_id
+
+        db_sess = create_session()
+        db_sess.add(comment)
+        db_sess.commit()
+        db_sess.close()
+        return redirect(f'/comment/{track_id}')
+
+    db_sess = create_session()
+    track = db_sess.query(Tracks).filter(Tracks.id == track_id).first()
+    comments = db_sess.query(Comments).filter(Comments.track_id == track_id).all()
+    for comment in comments:
+        comment.author_id = db_sess.query(User).filter(User.id == comment.author_id).first().name
+    db_sess.close()
+    return render_template('comments.html', comments=comments, track=track, form=form)
+
+
+@app.route('/add_to_favorites/<track_id>')
+def add_to_favorites(track_id):
+    favorite = Favorites()
+    favorite.track_id = track_id
+    favorite.user_id = current_user.id
+
+    db_sess = create_session()
+    db_sess.add(favorite)
+    db_sess.commit()
+    db_sess.close()
+
+    return redirect('/search')
+
+
+@app.route('/remove_from_favorites/<track_id>')
+def remove_from_favorites(track_id):
+    db_sess = create_session()
+    x = db_sess.query(Favorites).filter(Favorites.track_id == track_id, Favorites.user_id == current_user.id).first()
+
+    db_sess.delete(x)
+    db_sess.commit()
+    db_sess.close()
+
+    return redirect('/favorites')
+
+
+@app.route('/favorites')
+def favorites():
+    db_sess = create_session()
+    tracks = [db_sess.query(Tracks).filter(Tracks.id == track_id).first()
+              for track_id in [f.track_id for f in db_sess.query(Favorites).filter(Favorites.user_id == current_user.id)
+              .all()]]
+
+    db_sess.close()
+    for track in tracks:
+        print(track)
+        track.author = db_sess.query(User).filter(User.id == track.author).first().name
+        track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
+        track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
+    return render_template('search.html', tracks=tracks)
 
 
 def main():

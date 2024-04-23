@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <table align="center">
+      <tbody class="table-group-divider">
+          <tr>
+            <td><a href="/{{ track.image }}"><img width="150" height="150" src={{ track.image }} /></a></td>
+            <td>
+              <h5>{{ track.name }} | {{ track.author }}</h5>
+              <audio controls src={{ track.track_file }}></audio>
+              <h6>{{ track.description }}</h6>
+            </td>
+          </tr>
+          <tr>
+              <td>
+                  {% for comment in comments %}
+                    <h3>{{ comment.author_id }}</h3>
+                    <h6>{{ comment.content }}</h6>
+                  {% endfor %}
+              </td>
+          </tr>
+          <tr>
+              <td>
+                  <form action="" method="post">
+                    {{ form.hidden_tag() }}
+                    <p>
+                        {{ form.content.label }}<br>
+                        {{ form.content(class="form-control", type="text") }}<br>
+                        {% for error in form.content.errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                       {% endfor %}
+                    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+                  </form>
+              </td>
+          </tr>
+      </tbody>
+    </table>
+
+{% endblock %}

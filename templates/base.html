@@ -15,7 +15,8 @@
                 <h1>MOMusic</h1>
                 <a class="navbar-brand" href="/search" style="color: #a6a7aa">Главная</a>
                 {% if current_user.is_authenticated %}
-                     <a class="navbar-brand" href="/load_track" style="color: #a6a7aa">Загрузить трек</a>
+                     <a class="navbar-brand" href="/favorites" style="color: #a6a7aa">Любимые треки</a>
+                     <a class="navbar-brand" href="/my_tracks" style="color: #a6a7aa">Мои Треки</a>
                      <a class="navbar-brand" href="/profile">{{ current_user.name }}</a>
                 {% else %}
                     <p>

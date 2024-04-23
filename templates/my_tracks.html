@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <p align="right"><a class="btn btn-primary" href="/load_track">⬆️Загрузить трек</a></p>
+
+  {% for track in tracks %}
+    <table align="center">
+      <tbody class="table-group-divider">
+          <tr>
+            <td><a href="/{{ track.image }}"><img width="150" height="150" src={{ track.image }} /></a></td>
+            <td>
+              <h5>{{ track.name }} | {{ track.author }}</h5>
+              <audio controls src={{ track.track_file }}></audio>
+              <h6>{{ track.description }}</h6>
+            </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td><h5 align="center">{{ track.rating }}</h5></td>
+            <td><a class="btn btn-danger" href="/delete/{{ track.id }}">Delete</a>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+  {% endfor %}
+
+{% endblock %}

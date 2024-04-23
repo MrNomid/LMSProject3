@@ -16,7 +16,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     tracks = orm.relationship("Tracks")
-    comments = orm.relationship("Comments")
+    # comments = orm.relationship("Comments")
 
     def __repr__(self):
         return f'<> {self.id} {self.name}'

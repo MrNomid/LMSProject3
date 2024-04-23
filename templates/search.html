@@ -3,6 +3,7 @@
 {% block content %}
 
   {% for track in tracks %}
+<!--    TODO: Make it more good-looking-->
     <table align="center">
       <tbody class="table-group-divider">
           <tr>
@@ -11,14 +12,35 @@
               <h5>{{ track.name }} | {{ track.author }}</h5>
               <audio controls src={{ track.track_file }}></audio>
               <h6>{{ track.description }}</h6>
+
+<!--              <button>Описание</button>-->
+<!--              <div-->
+<!--              role="dialog"-->
+<!--              aria-labelledby="label"-->
+<!--              aria-describedby="description"-->
+<!--              aria-modal="true"-->
+<!--            >-->
+<!--               <p id="description">-->
+<!--               {{ track.description }}-->
+<!--               </p>-->
+<!--               <button>Закрыть</button>-->
+            </div>
             </td>
           </tr>
 
           <tr>
             <td><h5 align="center">{{ track.rating }}</h5></td>
-            <td><a class="btn btn-success" href="/upvote">Upvote</a>
-                <a class="btn btn-warning" href="/add_to_favorites">Add to favorites</a>
-                <a class="btn btn-primary" href="/comment">Comment</a>
+            {% if current_user.id in track.upvoted_users %}
+                <td><a class="btn btn-danger" href="/downvote/{{ track.id }}">Downvote</a>
+            {% else %}
+                <td><a class="btn btn-success" href="/upvote/{{ track.id }}">Upvote</a>
+            {% endif %}
+            {% if current_user.id in track.favorite_users %}
+                <a class="btn btn-warning" href="/remove_from_favorites/{{ track.id }}">❌Remove from favorites</a>
+            {% else %}
+                <a class="btn btn-warning" href="/add_to_favorites/{{ track.id }}">Add to favorites</a>
+            {% endif %}
+                <a class="btn btn-primary" href="/comment/{{ track.id }}">Comment</a>
             </td>
           </tr>
       </tbody>
