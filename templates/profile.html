@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2 ALIGN="CENTER">Ваш профиль:</h2>
+    <table align="center">
+        <thead>
+        <tr bgcolor="dddddd" align="center"></tr>
+        </thead>
+
+        <tbody class="table-group-divider">
+          <tr>
+            <td><h5>Ваше имя:</h5></td>
+            <td><h5>{{ current_user.name }}</h5></td>
+            <td><p align="center"><a class="btn btn-primary" href="/change">Изменить</a></p></td>
+
+          <tr>
+            <td><h5>Ваша почта:</h5></td>
+            <td><h5>{{ current_user.email }}</h5></td>
+          </tr>
+        </tbody>
+    </table>
+    <p align="center"><a class="btn btn-danger" href="/logout">Выйти</a></p>
+{% endblock %}
