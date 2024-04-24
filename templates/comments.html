@@ -13,14 +13,6 @@
           </tr>
           <tr>
               <td>
-                  {% for comment in comments %}
-                    <h3>{{ comment.author_id }}</h3>
-                    <h6>{{ comment.content }}</h6>
-                  {% endfor %}
-              </td>
-          </tr>
-          <tr>
-              <td>
                   <form action="" method="post">
                     {{ form.hidden_tag() }}
                     <p>
@@ -31,8 +23,17 @@
                                 {{ error }}
                             </div>
                        {% endfor %}
-                    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+                    {{ form.submit(type="submit", class="btn btn-primary") }}
                   </form>
+              </td>
+          </tr>
+          <tr><td><hr /></td></tr>
+          <tr>
+              <td>
+                  {% for comment in comments %}
+                    <h3>{{ comment.author_id }}</h3>
+                    <h6>{{ comment.content }}</h6>
+                  {% endfor %}
               </td>
           </tr>
       </tbody>

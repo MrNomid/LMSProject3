@@ -13,3 +13,7 @@ th {
 td {
    border: 1px solid grey;
 }
+.center {
+    width: 600px;
+    margin: auto;
+}

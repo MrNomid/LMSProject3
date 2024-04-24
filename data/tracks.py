@@ -13,10 +13,12 @@ class Tracks(SqlAlchemyBase, SerializerMixin):
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True, unique=True)
     genres = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    author = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
-    description = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    author_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
+    description = sqlalchemy.Column(sqlalchemy.Text, nullable=True)
     image = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     track_file = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+
+    author = None
 
     # user = orm.relationship('User')
     # comments = orm.relationship("Comments")

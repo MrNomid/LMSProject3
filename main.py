@@ -1,6 +1,7 @@
 from flask import Flask, url_for, render_template, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
+from data.change_form import ChangeForm
 from data.comment_form import CommentForm
 from data.comments import Comments
 from data.favorites import Favorites
@@ -8,6 +9,7 @@ from data.login_form import LoginForm
 from data.register_form import RegisterForm
 from data.load_track_form import LoadTrackForm
 from data.db_session import create_session, global_init
+from data.search_form import SearchForm
 from data.tracks import Tracks
 from data.upvotes import Upvotes
 from data.users import User
@@ -37,6 +39,7 @@ def index():
     return render_template("base.html", names=names, title='MOMusic')
 
 
+# Вход в систему
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -52,6 +55,7 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
+# Регистрация в системе
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -64,13 +68,13 @@ def register():
             db_sess = create_session()
             db_sess.add(user)
             db_sess.commit()
-            db_sess.close()
             login_user(user)
             return redirect('/')
         return render_template('register.html', message='Что-то не так', form=form)
     return render_template('register.html', title='Регистрация', form=form)
 
 
+# Выход из системы
 @app.route('/logout')
 @login_required
 def logout():
@@ -78,11 +82,29 @@ def logout():
     return redirect("/")
 
 
-@app.route('/profile')
+# Профиль пользователя
+@app.route('/profile', methods=['GET', 'POST'])
 def profile():
     return render_template('profile.html')
 
 
+@app.route('/change', methods=['GET', 'POST'])
+def change():
+    form = ChangeForm()
+    if form.validate_on_submit():
+        if current_user.check_password(form.password.data):
+            db_sess = create_session()
+            user = db_sess.query(User).filter(User.id == current_user.id).first()
+            user.name = form.name.data
+            db_sess.add(user)
+            db_sess.commit()
+            db_sess.close()
+            return redirect('/profile')
+
+    return render_template('change.html', form=form)
+
+
+# Загрузка нового трека
 @app.route('/load_track', methods=['GET', 'POST'])
 def load_track():
     form = LoadTrackForm()
@@ -98,7 +120,7 @@ def load_track():
         track.description = form.description.data
         track.image = f'../static/track_images/{image_filename}'
         track.track_file = f'../static/tracks/{track_filename}'
-        track.author = current_user.id
+        track.author_id = current_user.id
         track.rating = 10
         db_sess = create_session()
         db_sess.add(track)
@@ -108,30 +130,38 @@ def load_track():
     return render_template('load_track.html', form=form, title="Публикация трека")
 
 
-@app.route('/search')
+# Просммотр треков
+@app.route('/search', methods=['GET', 'POST'])
 def search():
+    form = SearchForm()
     db_sess = create_session()
-    tracks = db_sess.query(Tracks).all()
+    if form.validate_on_submit():
+        tracks = db_sess.query(Tracks).filter(Tracks.name.like(f'%{form.content.data}%')).all()
+    else:
+        tracks = db_sess.query(Tracks).all()
+
     for track in tracks:
-        track.author = db_sess.query(User).filter(User.id == track.author).first().name
+        print(track.author_id)
+        track.author = db_sess.query(User).filter(User.id == track.author_id).first().name
         track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
         track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
     db_sess.close()
-    return render_template('search.html', tracks=tracks)
+    return render_template('search.html', tracks=tracks, form=form)
 
 
+# Треки пользователя
 @app.route('/my_tracks', methods=['GET', 'POST'])
 def my_tracks():
     db_sess = create_session()
-    tracks = db_sess.query(Tracks).filter(Tracks.author == current_user.id).all()
+    tracks = db_sess.query(Tracks).filter(Tracks.author_id == current_user.id).all()
     for track in tracks:
-        track.author = db_sess.query(User).filter(User.id == track.author).first().name
         track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
         track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
     db_sess.close()
     return render_template('my_tracks.html', tracks=tracks)
 
 
+# Удалить определённый трек
 @app.route('/delete/<track_id>')
 def delete(track_id):
     db_sess = create_session()
@@ -144,6 +174,7 @@ def delete(track_id):
     return redirect(f'/my_tracks')
 
 
+# Оценить трек
 @app.route('/upvote/<track_id>')
 def upvote(track_id):
     db_sess = create_session()
@@ -163,6 +194,7 @@ def upvote(track_id):
     return redirect('/search')
 
 
+# Убрать оценку трека
 @app.route('/downvote/<track_id>')
 def downvote(track_id):
     db_sess = create_session()
@@ -175,6 +207,7 @@ def downvote(track_id):
     return redirect('/search')
 
 
+# Прокоментировать трек
 @app.route('/comment/<track_id>', methods=['GET', 'POST'])
 def comment(track_id):
     form = CommentForm()
@@ -199,6 +232,22 @@ def comment(track_id):
     return render_template('comments.html', comments=comments, track=track, form=form)
 
 
+# Треки определённого пользователя
+@app.route('/users_tracks/<user_id>')
+def users_tracks(user_id):
+    db_sess = create_session()
+
+    tracks = db_sess.query(Tracks).filter(Tracks.author_id == user_id).all()
+
+    for track in tracks:
+        track.author = db_sess.query(User).filter(User.id == track.author_id).first().name
+        track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
+        track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
+    db_sess.close()
+    return render_template('search.html', tracks=tracks, form=None)
+
+
+# Добавить трек в любимое
 @app.route('/add_to_favorites/<track_id>')
 def add_to_favorites(track_id):
     favorite = Favorites()
@@ -213,6 +262,7 @@ def add_to_favorites(track_id):
     return redirect('/search')
 
 
+# Удалить трек из любимого
 @app.route('/remove_from_favorites/<track_id>')
 def remove_from_favorites(track_id):
     db_sess = create_session()
@@ -225,6 +275,7 @@ def remove_from_favorites(track_id):
     return redirect('/favorites')
 
 
+# Просмотреть любимое треки
 @app.route('/favorites')
 def favorites():
     db_sess = create_session()
@@ -234,11 +285,10 @@ def favorites():
 
     db_sess.close()
     for track in tracks:
-        print(track)
-        track.author = db_sess.query(User).filter(User.id == track.author).first().name
+        track.author = db_sess.query(User).filter(User.id == track.author_id).first().name
         track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
         track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
-    return render_template('search.html', tracks=tracks)
+    return render_template('search.html', tracks=tracks, form=None)
 
 
 def main():
