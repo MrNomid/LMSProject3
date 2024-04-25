@@ -141,7 +141,6 @@ def search():
         tracks = db_sess.query(Tracks).all()
 
     for track in tracks:
-        print(track.author_id)
         track.author = db_sess.query(User).filter(User.id == track.author_id).first().name
         track.set_rating(db_sess.query(Upvotes).filter(Upvotes.track_id == track.id).all())
         track.set_favorite_users(db_sess.query(Favorites).filter(Favorites.track_id == track.id).all())
@@ -225,6 +224,8 @@ def comment(track_id):
 
     db_sess = create_session()
     track = db_sess.query(Tracks).filter(Tracks.id == track_id).first()
+    track.author = db_sess.query(User).filter(User.id == track.author_id).first().name
+
     comments = db_sess.query(Comments).filter(Comments.track_id == track_id).all()
     for comment in comments:
         comment.author_id = db_sess.query(User).filter(User.id == comment.author_id).first().name
