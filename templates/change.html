@@ -1,27 +1,160 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Изменить имя</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            Новое имя<br>
-            {{ form.name(class="form-control", type="text") }}<br>
-            {% for error in form.name.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <!-- Заголовок формы -->
+                <div class="card-header bg-info bg-gradient text-white py-4 rounded-top-4 border-0">
+                    <div class="text-center">
+                        <div class="display-4 mb-2">👤</div>
+                        <h1 class="mb-0">Изменение имени</h1>
+                        <p class="mb-0 opacity-75">Обновите информацию профиля</p>
+                    </div>
                 </div>
-            {% endfor %}
-        <p>
-            Пароль<br>
-            {{ form.password(class="form-control", type="password") }}<br>
-            {% for error in form.password.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+
+                <div class="card-body p-4 p-md-5">
+                    <form action="" method="post" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="row g-4">
+                            <!-- Новое имя -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.name(class="form-control form-control-lg", type="text",
+                                               placeholder="Новое имя", id="newNameInput") }}
+                                    <label for="newNameInput">Новое имя</label>
+                                </div>
+                                <div class="form-text">Текущее имя: <strong>{{ current_user.name }}</strong></div>
+                                {% for error in form.name.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Пароль для подтверждения -->
+                            <div class="col-12">
+                                <div class="form-floating position-relative">
+                                    {{ form.password(class="form-control form-control-lg", type="password",
+                                                    placeholder="Пароль", id="changePasswordInput") }}
+                                    <label for="changePasswordInput">Пароль</label>
+                                    <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                                            onclick="togglePassword('changePasswordInput')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="form-text">Введите ваш текущий пароль для подтверждения</div>
+                                {% for error in form.password.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Сообщение об ошибке/успехе -->
+                            {% if message %}
+                            <div class="col-12">
+                                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>{{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Кнопки -->
+                            <div class="col-12">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                    <a href="{{ url_for('profile') }}" class="btn btn-outline-secondary btn-lg">
+                                        <i class="bi bi-x-circle me-1"></i>Отмена
+                                    </a>
+                                    {{ form.submit(type="submit", class="btn btn-info btn-lg fw-bold px-4",
+                                                  style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+                                                         border: none;") }}
+                                </div>
+                            </div>
+
+                            <!-- Предупреждение -->
+                            <div class="col-12">
+                                <div class="alert alert-warning bg-warning bg-opacity-10 border-warning border-opacity-25">
+                                    <div class="d-flex">
+                                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                        <div>
+                                            <h6 class="alert-heading mb-1">Обратите внимание</h6>
+                                            <p class="mb-0 small">Изменение имени повлияет на отображение во всех ваших треках и комментариях.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-        <div>{{ message }}</div>
-    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-floating > .form-control {
+        padding-left: 3rem;
+    }
+
+    .form-floating > label {
+        padding-left: 3rem;
+    }
+
+    .form-floating > .form-control:focus ~ label {
+        color: #17a2b8;
+    }
+
+    #newNameInput + label:before { content: "\f4e8"; }
+    #changePasswordInput + label:before { content: "\f47a"; }
+
+    .form-text {
+        padding-left: 3rem;
+        margin-top: 0.25rem;
+    }
+
+    .btn-outline-secondary:hover {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        border-color: transparent;
+        color: white;
+    }
+</style>
+
+<script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = input.nextElementSibling.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+
+    // Валидация формы
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 {% endblock %}

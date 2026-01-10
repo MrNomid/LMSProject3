@@ -1,45 +1,200 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Регистрация</h1>
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.name.label }}<br>
-            {{ form.name(class="form-control", type="text") }}<br>
-            {% for error in form.name.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <!-- Заголовок формы -->
+                <div class="card-header bg-primary bg-gradient text-white py-4 rounded-top-4 border-0">
+                    <div class="text-center">
+                        <div class="display-4 mb-2">🎵</div>
+                        <h1 class="mb-0">Регистрация</h1>
+                        <p class="mb-0 opacity-75">Создайте аккаунт и начните делиться музыкой</p>
+                    </div>
                 </div>
-            {% endfor %}
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(class="form-control", type="email") }}<br>
-            {% for error in form.email.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+
+                <div class="card-body p-4 p-md-5">
+                    <form action="" method="post" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="row g-4">
+                            <!-- Имя пользователя -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.name(class="form-control form-control-lg", type="text",
+                                               placeholder="Ваше имя", id="nameInput") }}
+                                    {{ form.name.label(for="nameInput") }}
+                                </div>
+                                {% for error in form.name.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.email(class="form-control form-control-lg", type="email",
+                                                 placeholder="name@example.com", id="emailInput") }}
+                                    {{ form.email.label(for="emailInput") }}
+                                </div>
+                                {% for error in form.email.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Пароль -->
+                            <div class="col-12">
+                                <div class="form-floating position-relative">
+                                    {{ form.password(class="form-control form-control-lg", type="password",
+                                                    placeholder="Пароль", id="passwordInput") }}
+                                    {{ form.password.label(for="passwordInput") }}
+                                    <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                                            onclick="togglePassword('passwordInput')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                {% for error in form.password.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Подтверждение пароля -->
+                            <div class="col-12">
+                                <div class="form-floating position-relative">
+                                    {{ form.password_confirmation(class="form-control form-control-lg", type="password",
+                                                                 placeholder="Подтверждение пароля", id="passwordConfirmInput") }}
+                                    {{ form.password_confirmation.label(for="passwordConfirmInput") }}
+                                    <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y pe-3"
+                                            onclick="togglePassword('passwordConfirmInput')">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                {% for error in form.password_confirmation.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Сообщение об ошибке/успехе -->
+                            {% if message %}
+                            <div class="col-12">
+                                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>{{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Кнопка отправки -->
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    {{ form.submit(type="submit", class="btn btn-primary btn-lg fw-bold",
+                                                  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;") }}
+                                </div>
+                            </div>
+
+                            <!-- Ссылка на вход -->
+                            <div class="col-12 text-center">
+                                <p class="text-muted mb-0">
+                                    Уже есть аккаунт?
+                                    <a href="{{ url_for('login') }}" class="text-decoration-none fw-bold">
+                                        Войти
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(class="form-control", type="password") }}<br>
-            {% for error in form.password.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password_confirmation.label }}<br>
-            {{ form.password_confirmation(class="form-control", type="password") }}<br>
-            {% for error in form.password_confirmation.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-        <div>{{ message }}</div>
-    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-floating > .form-control {
+        padding-left: 3rem;
+    }
+
+    .form-floating > label {
+        padding-left: 3rem;
+    }
+
+    .form-floating > .form-control:focus ~ label {
+        color: #764ba2;
+    }
+
+    .form-floating > .form-control:not(:placeholder-shown) ~ label {
+        color: #6c757d;
+    }
+
+    .form-floating:before {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: "Bootstrap Icons";
+        font-size: 1.25rem;
+        color: #667eea;
+        z-index: 3;
+    }
+
+    #nameInput + label:before { content: "\f4e8"; }
+    #emailInput + label:before { content: "\f32c"; }
+    #passwordInput + label:before { content: "\f47a"; }
+    #passwordConfirmInput + label:before { content: "\f46a"; }
+
+    .btn-link {
+        color: #667eea;
+        z-index: 3;
+    }
+
+    .btn-link:hover {
+        color: #764ba2;
+    }
+</style>
+
+<script>
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        const icon = input.nextElementSibling.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        }
+    }
+
+    // Валидация формы
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 {% endblock %}

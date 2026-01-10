@@ -48,7 +48,7 @@ def login():
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/")
+            return redirect("/search")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
@@ -69,7 +69,7 @@ def register():
             db_sess.add(user)
             db_sess.commit()
             login_user(user)
-            return redirect('/')
+            return redirect('/search')
         return render_template('register.html', message='Что-то не так', form=form)
     return render_template('register.html', title='Регистрация', form=form)
 
@@ -85,7 +85,13 @@ def logout():
 # Профиль пользователя
 @app.route('/profile', methods=['GET', 'POST'])
 def profile():
-    return render_template('profile.html')
+    db_sess = create_session()
+    user_tracks = len(db_sess.query(Tracks).filter(Tracks.author_id == current_user.id).all())
+    favourite_tracks = len([db_sess.query(Tracks).filter(Tracks.id == track_id).first()
+              for track_id in [f.track_id for f in db_sess.query(Favorites).filter(Favorites.user_id == current_user.id)
+        .all()]])
+
+    return render_template('profile.html', user_tracks=user_tracks, favourite_tracks=favourite_tracks)
 
 
 @app.route('/change', methods=['GET', 'POST'])
@@ -139,6 +145,8 @@ def search():
         tracks = db_sess.query(Tracks).filter(Tracks.name.like(f'%{form.content.data}%')).all()
     else:
         tracks = db_sess.query(Tracks).all()
+
+    print(tracks)
 
     for track in tracks:
         track.author = db_sess.query(User).filter(User.id == track.author_id).first().name

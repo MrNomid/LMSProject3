@@ -1,75 +1,215 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container mt-4">
+    <!-- Форма для добавления трека -->
     {% if form %}
-    <form action="" method="post">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.content.label }}<br>
-            {{ form.content(class="form-control", type="text") }}<br>
-            {% for error in form.content.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        <p align="right">{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-        </div>
-    </form>
-    {% endif %}
-    <table align="left" class="center">
-      <tbody class="table-group-divider">
-          {% for track in tracks %}
-          <tr>
-            <td><a href="/{{ track.image }}"><img width="150" height="150" src={{ track.image }} /></a></td>
-            <td>
-              <a class="navbar-brand" href="/users_tracks/{{ track.author_id }}" style="color: #a6a7aa">{{ track.author }}</a>
-              <h5>{{ track.name }}</h5>
-              <p style="color: #0c6efd; padding-left: 0.5em">{{ track.genres }}</p>
-              <audio controls src={{ track.track_file }}></audio>
-              <br />
-              <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#exampleModal{{ track.id }}">
-                  Описание
-              </button>
-
-                <div class="modal fade" id="exampleModal{{ track.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="False">
-                  <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Описание</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-                      </div>
-                      <div class="modal-body">
-                          <pre>{{ track.description }}</pre>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                      </div>
+    <div class="card mb-5 shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+        <div class="card-body text-white p-4">
+            <h3 class="card-title mb-3">🎵 Поделитесь своей музыкой</h3>
+            <form action="" method="post" class="needs-validation" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.content.label(class="form-label fw-bold") }}
+                    {{ form.content(class="form-control form-control-lg", type="text", placeholder="Расскажите о вашем треке...") }}
+                    {% for error in form.content.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                        {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
-                  </div>
+                    {% endfor %}
                 </div>
+                <div class="d-flex justify-content-end">
+                    {{ form.submit(type="submit", class="btn btn-light btn-lg px-4 fw-bold", style="color: #764ba2;") }}
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 
-            </td>
-          </tr>
+    <!-- Сетка треков -->
+    <div class="row g-4">
+        {% for track in tracks %}
+        <div class="col-lg-6 col-xl-4">
+            <div class="card h-100 shadow-sm border-0 hover-lift">
+                <div class="card-body">
+                    <!-- Заголовок карточки -->
+                    <div class="d-flex align-items-start mb-3">
+                        <a href="/{{ track.image }}" class="me-3 flex-shrink-0">
+                            <img width="80" height="80" src="{{ track.image }}"
+                                 class="rounded-3 shadow" alt="{{ track.name }}"
+                                 style="object-fit: cover;">
+                        </a>
+                        <div class="flex-grow-1">
+                            <a class="text-decoration-none" href="/users_tracks/{{ track.author_id }}">
+                                <small class="text-muted d-block">👤 {{ track.author }}</small>
+                            </a>
+                            <h5 class="card-title mb-1">{{ track.name }}</h5>
+                            <div class="badge bg-light text-dark border mb-2">
+                                {{ track.genres }}
+                            </div>
+                        </div>
+                    </div>
 
-          <tr>
-            <td><h5 align="center">{{ track.rating }}</h5></td>
-            {% if current_user.id in track.upvoted_users %}
-                <td><a class="btn btn-danger" href="/downvote/{{ track.id }}">Downvote</a>
-            {% else %}
-                <td><a class="btn btn-success" href="/upvote/{{ track.id }}">Upvote</a>
-            {% endif %}
-            {% if current_user.id in track.favorite_users %}
-                <a class="btn btn-warning" href="/remove_from_favorites/{{ track.id }}">❌Remove from favorites</a>
-            {% else %}
-                <a class="btn btn-warning" href="/add_to_favorites/{{ track.id }}">Add to favorites</a>
-            {% endif %}
-                <a class="btn btn-primary" href="/comment/{{ track.id }}">Comment</a>
-            <hr />
-            </td>
-          </tr>
-          {% endfor %}
-      </tbody>
-    </table>
+                    <!-- Аудиоплеер -->
+                    <div class="mb-4">
+                        <audio controls class="w-100 custom-audio-player">
+                            <source src="{{ track.track_file }}" type="audio/mpeg">
+                        </audio>
+                    </div>
 
+                    <!-- Рейтинг и действия -->
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center">
+                            <div class="rating-badge bg-success bg-opacity-10 text-dark fw-bold px-3 py-1 rounded-pill">
+                                <i class="bi bi-star-fill me-1"></i>
+                                <span class="fw-bold">{{ track.rating }}</span>
+                            </div>
+                        </div>
 
+                        <!-- Кнопка описания -->
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#exampleModal{{ track.id }}">
+                            <i class="bi bi-info-circle me-1"></i>Описание
+                        </button>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if current_user.id in track.upvoted_users %}
+                        <a class="btn btn-outline-danger btn-sm flex-fill" href="/downvote/{{ track.id }}">
+                            <i class="bi bi-arrow-down-circle me-1"></i>Downvote
+                        </a>
+                        {% else %}
+                        <a class="btn btn-outline-success btn-sm flex-fill" href="/upvote/{{ track.id }}">
+                            <i class="bi bi-arrow-up-circle me-1"></i>Upvote
+                        </a>
+                        {% endif %}
+
+                        {% if current_user.id in track.favorite_users %}
+                        <a class="btn btn-warning btn-sm flex-fill" href="/remove_from_favorites/{{ track.id }}">
+                            <i class="bi bi-heart-fill me-1"></i>Удалить
+                        </a>
+                        {% else %}
+                        <a class="btn btn-outline-warning btn-sm flex-fill" href="/add_to_favorites/{{ track.id }}">
+                            <i class="bi bi-heart me-1"></i>В избранное
+                        </a>
+                        {% endif %}
+
+                        <a class="btn btn-primary btn-sm flex-fill" href="/comment/{{ track.id }}">
+                            <i class="bi bi-chat-left-text me-1"></i>Комментировать
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно описания -->
+        <div class="modal fade" id="exampleModal{{ track.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title">🎵 {{ track.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{{ track.image }}" width="60" height="60" class="rounded me-3">
+                            <div>
+                                <h6 class="mb-0">{{ track.author }}</h6>
+                                <small class="text-muted">{{ track.genres }}</small>
+                            </div>
+                        </div>
+                        <div class="card bg-light border-0">
+                            <div class="card-body">
+                                <p class="mb-0">{{ track.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not tracks %}
+    <div class="text-center py-5">
+        <div class="display-1 mb-3">🎵</div>
+        <h3 class="mb-3">Пока нет загруженных треков</h3>
+        <p class="text-muted">Будьте первым, кто поделится своей музыкой!</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    /* Кастомные стили */
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+    .custom-audio-player {
+        border-radius: 10px;
+        background: #f8f9fa;
+    }
+
+    .custom-audio-player::-webkit-media-controls-panel {
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .rating-badge {
+        font-size: 0.9rem;
+    }
+
+    /* Градиентные кнопки */
+    .btn-outline-primary:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        color: white;
+    }
+
+    /* Анимация загрузки */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .col-lg-6, .col-xl-4 {
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+    /* Постепенное появление */
+    .col-lg-6:nth-child(1) { animation-delay: 0.1s; }
+    .col-lg-6:nth-child(2) { animation-delay: 0.2s; }
+    .col-lg-6:nth-child(3) { animation-delay: 0.3s; }
+</style>
+
+<!-- Bootstrap Icons (добавьте в base.html если еще нет) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<script>
+    // Валидация формы
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 {% endblock %}

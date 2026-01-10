@@ -1,55 +1,237 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Загрузка трека</h1>
-    <form action="" method="post" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.track_name.label }}<br>
-            {{ form.track_name(class="form-control", type="text") }}<br>
-            {% for error in form.track_name.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <!-- Заголовок формы -->
+                <div class="card-header bg-warning bg-gradient text-white py-4 rounded-top-4 border-0">
+                    <div class="text-center">
+                        <div class="display-4 mb-2">🎶</div>
+                        <h1 class="mb-0">Загрузка трека</h1>
+                        <p class="mb-0 opacity-75">Поделитесь своей музыкой с сообществом</p>
+                    </div>
                 </div>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.genres.label }}<br>
-            {{ form.genres(class="form-control", type="text") }}<br>
-            {% for error in form.genres.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
+
+                <div class="card-body p-4 p-md-5">
+                    <form action="" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <div class="row g-4">
+                            <!-- Название трека -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.track_name(class="form-control form-control-lg", type="text",
+                                                      placeholder="Название трека", id="trackNameInput") }}
+                                    {{ form.track_name.label(for="trackNameInput") }}
+                                </div>
+                                {% for error in form.track_name.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Жанры -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.genres(class="form-control form-control-lg", type="text",
+                                                  placeholder="Рок, Поп, Хип-хоп", id="genresInput") }}
+                                    {{ form.genres.label(for="genresInput") }}
+                                </div>
+                                <div class="form-text">Укажите жанры через запятую</div>
+                                {% for error in form.genres.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Описание -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.description(class="form-control form-control-lg", type="text",
+                                                       placeholder="Опишите ваш трек...",
+                                                       id="descriptionInput", style="height: 120px") }}
+                                    {{ form.description.label(for="descriptionInput") }}
+                                </div>
+                                {% for error in form.description.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Изображение -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-image text-warning me-2"></i>
+                                            {{ form.image.label.text }}
+                                        </h5>
+                                        <p class="text-muted mb-3">Загрузите обложку для вашего трека</p>
+                                        {{ form.image(class="form-control form-control-lg", type="file",
+                                                     id="imageInput", accept="image/*") }}
+                                    </div>
+                                </div>
+                                {% for error in form.image.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Аудио файл -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-file-music text-warning me-2"></i>
+                                            {{ form.track.label.text }}
+                                        </h5>
+                                        <p class="text-muted mb-3">Загрузите аудио файл (MP3, WAV, etc.)</p>
+                                        {{ form.track(class="form-control form-control-lg", type="file",
+                                                     id="trackInput", accept="audio/*") }}
+                                    </div>
+                                </div>
+                                {% for error in form.track.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>{{ error }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Предпросмотр -->
+                            <div class="col-12">
+                                <div class="card border-0 bg-light bg-opacity-10">
+                                    <div class="card-body">
+                                        <h6 class="mb-3">
+                                            <i class="bi bi-eye me-2"></i>Предпросмотр
+                                        </h6>
+                                        <div id="imagePreview" class="text-center mb-3" style="display: none;">
+                                            <img id="previewImage" class="img-fluid rounded-3 shadow"
+                                                 style="max-height: 200px;">
+                                        </div>
+                                        <div id="audioPreview" class="text-center" style="display: none;">
+                                            <audio id="previewAudio" controls class="w-100"></audio>
+                                        </div>
+                                        <div id="noPreview" class="text-center py-3">
+                                            <p class="text-muted mb-0">
+                                                <i class="bi bi-info-circle me-1"></i>
+                                                Выберите файлы для предпросмотра
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Сообщение об ошибке/успехе -->
+                            {% if message %}
+                            <div class="col-12">
+                                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                    <i class="bi bi-info-circle me-2"></i>{{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <!-- Кнопка отправки -->
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    {{ form.submit(type="submit", class="btn btn-warning btn-lg fw-bold",
+                                                  style="background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+                                                         border: none; color: #000;") }}
+                                </div>
+                            </div>
+
+                            <!-- Ссылка назад -->
+                            <div class="col-12 text-center">
+                                <a href="javascript:history.back()" class="text-decoration-none">
+                                    <i class="bi bi-arrow-left me-1"></i>Вернуться назад
+                                </a>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.description.label }}<br>
-            {{ form.description(class="form-control", type="text") }}<br>
-            {% for error in form.description.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-                <p>
-            {{ form.image.label }}<br>
-            {{ form.image(class="form-control", type="file") }}<br>
-            {% for error in form.image.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-                <p>
-            {{ form.track.label }}<br>
-            {{ form.track(class="form-control", type="file") }}<br>
-            {% for error in form.track.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-        <div>{{ message }}</div>
-    </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-floating > .form-control {
+        padding-left: 3rem;
+    }
+
+    .form-floating > label {
+        padding-left: 3rem;
+    }
+
+    .form-floating > .form-control:focus ~ label {
+        color: #ffc107;
+    }
+
+    #trackNameInput + label:before { content: "\f4b7"; }
+    #genresInput + label:before { content: "\f4cf"; }
+    #descriptionInput + label:before { content: "\f14d"; }
+
+    .form-control-file {
+        padding: 0.5rem;
+    }
+
+    .card.bg-light {
+        background-color: #f8f9fa !important;
+        border-radius: 10px;
+    }
+</style>
+
+<script>
+    // Предпросмотр изображения
+    document.getElementById('imageInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImage').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('noPreview').style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Предпросмотр аудио
+    document.getElementById('trackInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const url = URL.createObjectURL(file);
+            document.getElementById('previewAudio').src = url;
+            document.getElementById('audioPreview').style.display = 'block';
+            document.getElementById('noPreview').style.display = 'none';
+        }
+    });
+
+    // Валидация формы
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 {% endblock %}
