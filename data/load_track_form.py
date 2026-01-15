@@ -8,6 +8,6 @@ class LoadTrackForm(FlaskForm):
     track_name = StringField('Название Трека', validators=[DataRequired()])
     genres = StringField('Жанры', validators=[DataRequired()])
     description = TextAreaField('Описание')
-    image = FileField('Загрузить обложку')
-    track = FileField('Загрузить трек')
+    image = FileField('Загрузить обложку', validators=[DataRequired()])
+    track = FileField('Загрузить трек', validators=[DataRequired()])
     submit = SubmitField('Опубликовать')

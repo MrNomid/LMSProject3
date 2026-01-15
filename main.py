@@ -1,5 +1,6 @@
 from flask import Flask, url_for, render_template, redirect
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from sqlalchemy import or_
 
 from data.change_form import ChangeForm
 from data.comment_form import CommentForm
@@ -142,11 +143,13 @@ def search():
     form = SearchForm()
     db_sess = create_session()
     if form.validate_on_submit():
-        tracks = db_sess.query(Tracks).filter(Tracks.name.like(f'%{form.content.data}%')).all()
+        users = db_sess.query(User).filter(User.name.like(f'%{form.content.data}%')).all()
+        if users:
+            tracks = db_sess.query(Tracks).filter(or_(Tracks.name.like(f'%{form.content.data}%'), Tracks.author_id == users[0].id)).all()
+        else:
+            tracks = db_sess.query(Tracks).filter(Tracks.name.like(f'%{form.content.data}%')).all()
     else:
         tracks = db_sess.query(Tracks).all()
-
-    print(tracks)
 
     for track in tracks:
         track.author = db_sess.query(User).filter(User.id == track.author_id).first().name

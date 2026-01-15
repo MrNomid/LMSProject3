@@ -1,0 +1,111 @@
+/* Мобильная адаптация для всего сайта */
+
+/* 1. Базовые настройки */
+* {
+    -webkit-tap-highlight-color: transparent; /* Убирает синий highlight при тапе */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 2. Адаптивные контейнеры */
+@media (max-width: 576px) {
+    .container, .container-fluid {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .card {
+        margin-bottom: 12px;
+        border-radius: 12px;
+    }
+
+    .card-body {
+        padding: 16px !important;
+    }
+}
+
+/* 3. Адаптивные изображения */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 4. Адаптивные кнопки (минимальный размер для касания) */
+.btn, button, a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 5. Адаптивные формы */
+@media (max-width: 576px) {
+    .form-control, .form-select {
+        font-size: 16px !important; /* Предотвращает zoom в iOS */
+        height: 48px;
+    }
+
+    .form-floating > label {
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+}
+
+/* 6. Адаптивные таблицы */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 7. Адаптивные модальные окна */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 8px;
+    }
+
+    .modal-content {
+        border-radius: 16px;
+    }
+}
+
+/* 8. Улучшение для горизонтальной ориентации */
+@media (max-height: 500px) and (orientation: landscape) {
+    .navbar {
+        position: static;
+    }
+
+    .mobile-card {
+        margin-bottom: 8px;
+    }
+}
+
+/* 9. Поддержка темной темы */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mobile-bg: #1a1a1a;
+        --mobile-text: #ffffff;
+    }
+}
+
+/* 10. Анимации для мобильных */
+@media (prefers-reduced-motion: no-preference) {
+    .mobile-card {
+        transition: transform 0.2s ease;
+    }
+
+    .mobile-card:active {
+        transform: scale(0.98);
+    }
+}
+
+/* 11. Специфичные стили для iOS */
+@supports (-webkit-touch-callout: none) {
+    input, textarea {
+        font-size: 16px !important;
+    }
+
+    .mobile-audio {
+        height: 40px;
+    }
+}
